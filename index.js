@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_ADMIN}:${process.env.DB_PASSWORD}@cluster0.4qal0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -72,14 +72,38 @@ async function run() {
 
 
         // Get all task of a specific user
+        // Category Filter Added
+        // app.get("/task", async (req, res)=> {
+        //     const query = {createdBy: req?.query?.email, category: req?.query?.category}
+        //     const option = {
+        //         sort: {date: -1}
+        //     }
+        //     const result = await taskCollection.find(query, option).toArray();
+        //     res.send(result);
+        // })
+
+
+        // Get all task of a specific user
 
         app.get("/task", async (req, res)=> {
-            const query = {createdBy: req?.query?.email, category: req?.query?.category}
+            const query = {createdBy: req?.query?.email}
             const option = {
                 sort: {date: -1}
             }
             const result = await taskCollection.find(query, option).toArray();
             res.send(result);
+        })
+
+        app.patch("/task", async (req, res)=> {
+            const filter = {_id: new ObjectId(req?.body?.taskId)}
+
+            const updateDoc = {
+                $set: {category: req?.body?.newCategory}
+            };
+
+            const result = await taskCollection.updateOne(filter, updateDoc);
+
+            res.send (result);
         })
 
 
