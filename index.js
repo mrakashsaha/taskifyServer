@@ -107,6 +107,44 @@ async function run() {
         })
 
 
+
+        // Delete A task
+        app.delete ("/deleteTask", async (req, res)=> {
+            const filter = {_id: new ObjectId (req?.query?.taskId)}
+
+            console.log(filter)
+
+            const result = await taskCollection.deleteOne(filter);
+            res.send (result);
+        })
+
+
+        app.patch("/updateTask", async (req, res)=> {
+            const filter = {_id: new ObjectId(req?.body?.taskId)}
+
+            const updateDoc = {
+                $set: {
+                    
+                    taskTitle: req?.body?.taskTitle,
+                    taskDescription: req?.body?.taskDescription,
+                    category: req?.body?.category,
+                }
+            };
+
+            const result = await taskCollection.updateOne(filter, updateDoc);
+
+            res.send (result);
+        })
+
+        
+        app.get("/taskById", async (req, res)=> {
+          
+            const query = {_id: new ObjectId (req?.query?.taskId)}
+            const result = await taskCollection.findOne(query);
+            res.send(result);
+        })
+
+
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
